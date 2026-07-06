@@ -41,7 +41,6 @@ async def read_books_by_author_path(author: str):
     for book in BOOKS:
         if book.get('author').casefold() == author.casefold():
             books_to_return.append(book)
-
     return books_to_return
 
 
@@ -52,7 +51,6 @@ async def read_author_category_by_query(book_author: str, category: str):
         if book.get('author').casefold() == book_author.casefold() and \
                 book.get('category').casefold() == category.casefold():
             books_to_return.append(book)
-
     return books_to_return
 
 

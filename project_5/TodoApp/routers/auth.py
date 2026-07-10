@@ -10,6 +10,9 @@ from models import Users
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
+from pathlib import Path
+
+
 router = APIRouter(
     prefix='/auth',
     tags=['auth']
@@ -43,9 +46,11 @@ def get_db():
     finally:
         db.close()
 
+
 db_dependency = Annotated[Session, Depends(get_db)]
 
-templates = Jinja2Templates(directory="project_5/TodoApp/templates")
+BASE_DIR = Path(__file__).resolve().parent.parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 
 ### Pages ###

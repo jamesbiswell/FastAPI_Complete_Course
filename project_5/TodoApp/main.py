@@ -4,15 +4,17 @@ from . import models
 from .database import engine
 from .routers import auth, todos, admin, user
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
-templates = Jinja2Templates(directory="project_5/TodoApp/templates")
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
-app.mount("/static", StaticFiles(directory="project_5/TodoApp/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 
 @app.get("/")

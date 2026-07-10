@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, Path as PathParam
 from pydantic import BaseModel, Field
 from starlette import status
 from ..models import Todos
@@ -6,6 +6,9 @@ from ..database import SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from .auth import get_current_user
+from starlette.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
 
 router = APIRouter(
     prefix='/todo',
@@ -24,6 +27,9 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
 
 class TodoRequest(BaseModel):
     title: str = Field(min_length=3)
@@ -31,6 +37,39 @@ class TodoRequest(BaseModel):
     priority: int = Field(gt=0, lt=6)
     complete: bool
 
+
+def redirect_to_login():
+    redirect_response = RedirectResponse(url="/auth/login-page", status_code=status.HTTP_302_FOUND)
+    redirect_response.delete_cookie(key="access_token")
+    return redirect_response
+
+
+### Pages ###
+
+@router.get("/todo-page")
+async def render_todo_page(request: Request, db: db_dependency):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+        if user is None:
+            return redirect_to_login()
+
+        todos = db.query(Todos).filter(Todos.owner_id == user.get("id")).all()
+
+        # old style of TemplateResponse creation
+        # return templates.TemplateResponse("todo.html", {"request": request, "todos": todos, "user": user})
+        return templates.TemplateResponse(
+            request=request,
+            context={
+                "todos": todos,
+                "user": user,
+            },
+            name="todo.html"
+        )
+    except HTTPException:
+        return redirect_to_login()
+
+
+### Endpoints ###
 
 @router.get("", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency,
@@ -44,7 +83,7 @@ async def read_all(user: user_dependency,
 @router.get("/{todo_id}", status_code=status.HTTP_200_OK)
 async def read_todo(user: user_dependency,
                     db: db_dependency,
-                    todo_id: int = Path(gt=0)):
+                    todo_id: int = PathParam(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
 
@@ -73,7 +112,7 @@ async def create_todo(user: user_dependency,
 @router.put("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_todo(user: user_dependency, db: db_dependency,
                       todo_request: TodoRequest,
-                      todo_id: int = Path(gt=0)):
+                      todo_id: int = PathParam(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
 
@@ -95,7 +134,7 @@ async def update_todo(user: user_dependency, db: db_dependency,
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_todo(user: user_dependency,
                       db: db_dependency,
-                      todo_id: int = Path(gt=0)):
+                      todo_id: int = PathParam(gt=0)):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication Failed')
 

@@ -76,7 +76,7 @@ if (editTodoForm) {
             });
 
             if (response.ok) {
-                window.location.href = '/todos/todo-page'; // Redirect to the todos page
+                window.location.href = '/todo/todo-page'; // Redirect to the todos page
             } else {
                 // Handle error
                 const errorData = await response.json();
@@ -107,7 +107,7 @@ if (editTodoForm) {
 
             if (response.ok) {
                 // Handle success
-                window.location.href = '/todos/todo-page'; // Redirect to the todos page
+                window.location.href = '/todo/todo-page'; // Redirect to the todos page
             } else {
                 // Handle error
                 const errorData = await response.json();
@@ -150,7 +150,7 @@ if (loginForm) {
                 logout();
                 // Save token to cookie
                 document.cookie = `access_token=${data.access_token}; path=/`;
-                window.location.href = '/todos/todo-page'; // Change this to your desired redirect page
+                window.location.href = '/todo/todo-page'; // Change this to your desired redirect page
             } else {
                 // Handle error
                 const errorData = await response.json();

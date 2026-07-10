@@ -18,8 +18,7 @@ app.mount("/static", StaticFiles(directory="project_5/TodoApp/static"), name="st
 @app.get("/")
 def test(request: Request):
     # old style of TemplateResponse creation
-    # return templates.TemplateResponse("home.html",
-    #                                   {"request": request})
+    # return templates.TemplateResponse("home.html", {"request": request})
     return templates.TemplateResponse(
         request=request,
         name="home.html",

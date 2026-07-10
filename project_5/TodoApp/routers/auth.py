@@ -60,6 +60,16 @@ def render_login_page(request: Request):
     )
 
 
+@router.get("/register-page")
+def render_register_page(request: Request):
+    # old style of TemplateResponse creation
+    # return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="register.html",
+    )
+
+
 ### Endpoints ###
 
 def authenticate_user(username: str, password: str, db):

@@ -95,6 +95,15 @@ def create_access_token(username: str, user_id: int,
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Could not validate user.'
+        )
+
+    if token.startswith("Bearer "):
+        token = token.removeprefix("Bearer ").strip()
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')

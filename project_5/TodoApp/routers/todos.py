@@ -65,6 +65,28 @@ async def render_todo_page(request: Request, db: db_dependency):
             },
             name="todo.html"
         )
+
+    except HTTPException:
+        return redirect_to_login()
+
+
+@router.get('/add-todo-page')
+async def render_add_todo_page(request: Request):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+        if user is None:
+            return redirect_to_login()
+
+        # old style of TemplateResponse creation
+        # return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
+        return templates.TemplateResponse(
+            request=request,
+            context={
+                "user": user,
+            },
+            name="add-todo.html"
+        )
+
     except HTTPException:
         return redirect_to_login()
 

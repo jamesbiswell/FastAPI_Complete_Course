@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import Response
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import Response, RedirectResponse
+from starlette import status
+# from fastapi.templating import Jinja2Templates
 from . import models
 from .database import engine
 from .routers import auth, todos, admin, user
@@ -13,7 +14,7 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+# templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
@@ -27,11 +28,11 @@ def chrome_devtools_config():
 def test(request: Request):
     # old style of TemplateResponse creation
     # return templates.TemplateResponse("home.html", {"request": request})
-    return templates.TemplateResponse(
-        request=request,
-        name="home.html",
-    )
-
+    # return templates.TemplateResponse(
+    #     request=request,
+    #     name="home.html"
+    # )
+    return RedirectResponse(url='/todo/todo-page', status_code=status.HTTP_302_FOUND)
 
 @app.get("/healthy")
 def health_check():

@@ -26,7 +26,7 @@ if (todoForm) {
             });
 
             if (response.ok) {
-                form.reset(); // Clear the form
+                window.location.href = '/todo/todo-page'; // Redirect to the todos page
             } else {
                 // Handle error
                 const errorData = await response.json();
